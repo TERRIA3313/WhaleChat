@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "838418904612",
+    "firebase_url": "https://pk-soft-96a65-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "pk-soft-96a65",
+    "storage_bucket": "pk-soft-96a65.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:838418904612:android:f959d460c93e1c093d8ab1",
+        "android_client_info": {
+          "package_name": "com.example.whalechat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "838418904612-1po1j3o6db1asikeoo9tad29mlmotuj3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDhbeFuwFcWmQc0KFtsfm9jFYOYxSFz6wc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "838418904612-1po1j3o6db1asikeoo9tad29mlmotuj3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
