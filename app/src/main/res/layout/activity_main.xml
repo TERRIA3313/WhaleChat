@@ -39,7 +39,7 @@
         app:layout_constraintStart_toStartOf="@+id/guideline3" />
 
     <Button
-        android:id="@+id/sign_Up"
+        android:id="@+id/Sign_Up"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Sign Up"
