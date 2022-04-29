@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -68,14 +69,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void LogIn(){
-        String User_Id = mEmailText.getText().toString().trim();
+        String User_Id = mEmailText.getText().toString().trim() + "@gmail.com";
         String password = mPasswordText.getText().toString().trim();
         firebaseAuth.signInWithEmailAndPassword(User_Id, password).addOnCompleteListener(MainActivity.this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
                     if(isFirst){
-                        save.ID=User_Id;
+                        save.ID=User_Id.substring(0, User_Id.length()-10);
                         save.Password=password;
 
                         SharedPreferences preferences = getSharedPreferences("account", MODE_PRIVATE);
