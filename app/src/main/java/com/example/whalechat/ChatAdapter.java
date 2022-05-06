@@ -1,0 +1,81 @@
+package com.example.whalechat;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
+public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> {
+    private List<ChatData> mDataset;
+    private String myNickName;
+
+    public static class MyViewHolder extends RecyclerView.ViewHolder{
+        public TextView TextView_Nickname;
+        public TextView TextView_Message;
+        public TextView TextView_Timestamp;
+        public ImageView ImageView_ProfileImage;
+        public String ProfileUri;
+        public View rootView;
+
+        public MyViewHolder(View v){
+            super(v);
+            TextView_Nickname = v.findViewById(R.id.TextView_Nickname);
+            TextView_Message = v.findViewById(R.id.TextView_Message);
+            TextView_Timestamp = v.findViewById(R.id.TextView_Timestamp);
+            ImageView_ProfileImage = v.findViewById(R.id.ImageView_Profile);
+            rootView = v;
+
+            v.setClickable(true);
+            v.setEnabled(true);
+        }
+    }
+
+    public ChatAdapter(List<ChatData> myDataset, Context context, String myNickName){
+        mDataset = myDataset;
+        this.myNickName = myNickName;
+    }
+
+    @Override
+    public ChatAdapter.MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType){
+        LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.chatting, parent, false);
+
+        MyViewHolder vh = new MyViewHolder(v);
+        return vh;
+    }
+
+    @Override
+    public void onBindViewHolder(MyViewHolder holder, int position){
+        ChatData chat = mDataset.get(position);
+        holder.TextView_Nickname.setText(chat.getNickname());
+        holder.TextView_Message.setText(chat.getMessage());
+        holder.TextView_Timestamp.setText(chat.getTimestamp());
+
+        if(chat.getNickname().equals(this.myNickName)){
+            holder.TextView_Message.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+            holder.TextView_Timestamp.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
+            holder.TextView_Nickname.setVisibility(View.INVISIBLE);
+        }
+        else{}
+    }
+
+    @Override
+    public int getItemCount(){
+        return mDataset==null ? 0 : mDataset.size();
+    }
+
+    public ChatData getChat(int position){
+        return mDataset != null ? mDataset.get(position) : null;
+    }
+
+    public void addChat(ChatData chat){
+        mDataset.add(chat);
+        notifyItemInserted(mDataset.size()-1);
+    }
+}

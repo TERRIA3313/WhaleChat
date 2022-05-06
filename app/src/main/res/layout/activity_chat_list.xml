@@ -36,7 +36,7 @@
                 android:id="@+id/AddList"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Add List"
+                android:text="ADD CHAT"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -46,7 +46,7 @@
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/ChattingList"
+        android:id="@+id/recycler_chatting_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:scrollbars="vertical"
