@@ -6,7 +6,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,10 +23,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Chat extends AppCompatActivity {
+    private static final String TAG = "Chat";
     private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
+    private ChatAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
-    private List<ChatData> chatList;
     private FirebaseAuth firebaseAuth;
     private String Nickname;
 
@@ -32,6 +34,9 @@ public class Chat extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        Intent intent = getIntent();
+        String Key = intent.getStringExtra("key");
 
         //파이어베이스 초기화
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -48,12 +53,13 @@ public class Chat extends AppCompatActivity {
         mRecyclerView.setLayoutManager(mLayoutManager);
 
         //리스너 등록
-        chatList = new ArrayList<>();
+        mAdapter = new ChatAdapter();
         //닉네임을 파이어베이스로 부터 가져오는 코드
         myRef.child("Users").child(user.getUid()).child("name").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 Nickname = snapshot.getValue(String.class);
+                mAdapter.setNickname(Nickname);
             }
 
             @Override
@@ -61,34 +67,18 @@ public class Chat extends AppCompatActivity {
 
             }
         });
-        mAdapter = new ChatAdapter(chatList, Chat.this, Nickname);
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
-        ChatData chat = new ChatData();
-        chat.setNickname(Nickname);
-        chat.setMessage("hi");
-        myRef.setValue(chat);
-
-        //채팅 기능
-        myRef.addChildEventListener(new ChildEventListener() {
+        //채팅방을 열었을 때
+        myRef.child("Rooms").child(Key).child("comments").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
-            }
-
-            @Override
-            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
-
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                for(DataSnapshot item :snapshot.getChildren()){
+                    Log.d(TAG, String.valueOf(item));
+                    mAdapter.addChat(item.getValue(ChatData.class));
+                }
             }
 
             @Override

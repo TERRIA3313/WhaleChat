@@ -15,5 +15,6 @@ public class ChatModel
         public String message;
         public Object timestamp;
         public String uid;
+        public String nickname;
     }
 }

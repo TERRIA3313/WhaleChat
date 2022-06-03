@@ -39,19 +39,22 @@ public class ChattingListAdapter extends RecyclerView.Adapter<ChattingListAdapte
     private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd hh:mm");
 
     private ArrayList<ChatModel> chatModels = new ArrayList<>();
+    private ArrayList<String> chatKey = new ArrayList<>();
     private String uid;
     private String ownerUid;
 
-    public void addItem(ChatModel chatModel){
+    public void addItem(ChatModel chatModel, String key){
         chatModels.add(chatModel);
+        chatKey.add(key);
         notifyDataSetChanged();
     }
 
     @NotNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType){
-        LayoutInflater inflater=LayoutInflater.from(parent.getContext());
-        View view=inflater.inflate(R.layout.chatting_room,parent,false);
+        //LayoutInflater inflater=LayoutInflater.from(parent.getContext());
+        //View view=inflater.inflate(R.layout.chatting_room,parent,false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chatting_room, parent, false);
         return new MyViewHolder(view);
     }
 
@@ -61,7 +64,6 @@ public class ChattingListAdapter extends RecyclerView.Adapter<ChattingListAdapte
 
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         ownerUid = chatModels.get(position).owner;
-        Log.d(TAG, "오너 UID : " + ownerUid);
 
         FirebaseDatabase.getInstance().getReference().child("Users").child(ownerUid).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -103,12 +105,22 @@ public class ChattingListAdapter extends RecyclerView.Adapter<ChattingListAdapte
         myViewHolder.RoomName.setTypeface(Typeface.DEFAULT_BOLD);
     }
 
+    public interface OnItemClickListener{
+        void onItemClick(View v, int position);
+    }
+
+    private OnItemClickListener mListener = null;
+
+    public void setOnItemClickListener(OnItemClickListener listener){
+        this.mListener = listener;
+    }
+
     @Override
     public int getItemCount() {
         return chatModels.size();
     }
 
-    public static class MyViewHolder extends RecyclerView.ViewHolder {
+    public class MyViewHolder extends RecyclerView.ViewHolder {
 
         private TextView RoomName;
         private TextView Message;
@@ -122,7 +134,27 @@ public class ChattingListAdapter extends RecyclerView.Adapter<ChattingListAdapte
             Message=itemView.findViewById(R.id.Message);
             LastChatTime=itemView.findViewById(R.id.LastChatTime);
             profile=itemView.findViewById(R.id.profile);
+
+            itemView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    int pos = getAbsoluteAdapterPosition();
+                    if(pos != RecyclerView.NO_POSITION)
+                    {
+                        mListener.onItemClick(v, pos);
+                    }
+                }
+            });
         }
     }
 
+    public ChatModel getRoom(int position){
+        return chatModels.get(position);
+    }
+
+    public String getKey(int position){
+        return chatKey.get(position);
+    }
 }

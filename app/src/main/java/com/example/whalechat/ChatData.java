@@ -3,40 +3,40 @@ package com.example.whalechat;
 import java.io.Serializable;
 
 public class ChatData implements Serializable {
-    private String Message;
-    private String Nickname;
-    private String Timestamp;
-    private String ProfileUri;
+    private String message;
+    private String nickname;
+    private Long timestamp;
+    private String uid;
 
     public String getMessage(){
-        return Message;
+        return message;
     }
 
     public void setMessage(String Message){
-        this.Message = Message;
+        this.message = Message;
     }
 
     public String getNickname(){
-        return Nickname;
+        return nickname;
     }
 
     public void setNickname(String Nickname){
-        this.Nickname = Nickname;
+        this.nickname = Nickname;
     }
 
-    public String getTimestamp(){
-        return Timestamp;
+    public Object getTimestamp(){
+        return timestamp;
     }
 
-    public void setTimestamp(String Timestamp){
-        this.Timestamp = Timestamp;
+    public void setTimestamp(Long Timestamp){
+        this.timestamp = Timestamp;
     }
 
-    public String getProfileUri(){
-        return ProfileUri;
+    public String getUid(){
+        return uid;
     }
 
-    public void setProfileUri(String ProfileUri){
-        this.ProfileUri = ProfileUri;
+    public void setUid(String uid){
+        this.uid = uid;
     }
 }

@@ -2,11 +2,15 @@ package com.example.whalechat;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,13 +26,7 @@ import java.util.HashMap;
 
 public class ChatList extends AppCompatActivity {
     private static final String TAG = "Chat_List";
-
-    private DatabaseReference databaseReference;
-    private FirebaseDatabase database;
-    private FirebaseAuth firebaseAuth;
     private String uid;
-    private ArrayList<ChatModel> chatModels = new ArrayList<>();
-
     private Button button_AddList;
 
     @Override
@@ -45,7 +43,7 @@ public class ChatList extends AppCompatActivity {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 for(DataSnapshot item :snapshot.getChildren()){
-                    mAdapter.addItem(item.getValue(ChatModel.class));
+                    mAdapter.addItem(item.getValue(ChatModel.class), item.getKey());
                 }
             }
 
@@ -55,24 +53,37 @@ public class ChatList extends AppCompatActivity {
         });
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addItemDecoration(new RecyclerViewDecoration(10));
 
-        //button_AddList = findViewById(R.id.AddList);
+        // 채팅방 만들기 버튼 관련
+        button_AddList = findViewById(R.id.AddList);
+
+        button_AddList.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent MainIntent = new Intent(ChatList.this, Chat.class);
+                startActivity(MainIntent);
+            }
+        });
+
+        // 기존에 있는 채팅방 선택
+        mAdapter.setOnItemClickListener(new ChattingListAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View v, int position) {
+                ChatModel Room = mAdapter.getRoom(position);
+                String Key = mAdapter.getKey(position);
+                Intent intent = new Intent(ChatList.this, Chat.class);
+                intent.putExtra("key", Key);
+                startActivity(intent);
+            }
+        });
     }
 
         //현재 개발중
     private void CreateRooms()
     {
-        button_AddList.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //채팅방의 해쉬맵 테이블을 등록
-                HashMap<Object, String> hashMap = new HashMap<>();
 
-                FirebaseDatabase database = FirebaseDatabase.getInstance();
-                DatabaseReference reference = database.getReference("Rooms");
-            }
-        });
     }
 }
