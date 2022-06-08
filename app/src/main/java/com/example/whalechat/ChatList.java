@@ -1,8 +1,13 @@
 package com.example.whalechat;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -28,6 +33,7 @@ public class ChatList extends AppCompatActivity {
     private static final String TAG = "Chat_List";
     private String uid;
     private Button button_AddList;
+    private final int REQUEST_CODE = 1102;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +44,7 @@ public class ChatList extends AppCompatActivity {
 
         ChattingListAdapter mAdapter = new ChattingListAdapter();
 
+        // 현재 유저의 uid
         uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
         FirebaseDatabase.getInstance().getReference().child("Rooms").orderByChild("users/"+uid).equalTo(true).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -63,9 +70,12 @@ public class ChatList extends AppCompatActivity {
         button_AddList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent MainIntent = new Intent(ChatList.this, Chat.class);
-                startActivity(MainIntent);
+                Intent intent = new Intent(ChatList.this, popup_create_room.class);
+                intent.putExtra("data", uid);
+                startActivityResult.launch(intent);
             }
+
+
         });
 
         // 기존에 있는 채팅방 선택
@@ -82,8 +92,24 @@ public class ChatList extends AppCompatActivity {
     }
 
         //현재 개발중
-    private void CreateRooms()
+    private void popupActivity()
     {
 
     }
+
+
+    ActivityResultLauncher<Intent> startActivityResult = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        String Key = result.getData().getStringExtra("key");
+                        Log.d(TAG, "key = " + Key);
+                        Intent MainIntent = new Intent(ChatList.this, Chat.class);
+                        MainIntent.putExtra("key", Key);
+                        startActivity(MainIntent);
+                    }
+                }
+            });
 }

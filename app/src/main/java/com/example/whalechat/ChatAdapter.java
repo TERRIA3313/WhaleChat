@@ -81,6 +81,12 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
             holder.TextView_Timestamp.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
             holder.TextView_Nickname.setVisibility(View.INVISIBLE);
         }
+        else if(chat.getNickname().equals("server")){
+            holder.TextView_Message.setGravity(View.TEXT_ALIGNMENT_CENTER);
+            holder.TextView_Message.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            holder.TextView_Timestamp.setVisibility(View.INVISIBLE);
+            holder.TextView_Nickname.setVisibility(View.INVISIBLE);
+        }
         else{
             String Uid = chat.getUid();
             FirebaseDatabase.getInstance().getReference().child("Users").child(Uid).addListenerForSingleValueEvent(new ValueEventListener() {

@@ -67,10 +67,9 @@ public class Chat extends AppCompatActivity {
 
             }
         });
-        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setAdapter(mAdapter);
 
+        Log.d(TAG, "Key : " + Key);
         //채팅방을 열었을 때
         myRef.child("Rooms").child(Key).child("comments").addValueEventListener(new ValueEventListener() {
             @Override
