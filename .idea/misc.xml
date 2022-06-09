@@ -3,14 +3,23 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/drawable/ic_android_black_24dp.xml" value="0.162" />
         <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/activity_chat.xml" value="0.25" />
         <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/activity_chat_list.xml" value="0.25" />
+        <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/activity_home.xml" value="0.25" />
         <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/activity_list_add_popup.xml" value="0.1697061803444782" />
         <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/activity_main.xml" value="0.3494791666666667" />
+        <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/activity_navigation.xml" value="0.15172239108409322" />
         <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/activity_popup_create_room.xml" value="0.33" />
         <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/activity_singup.xml" value="0.3494791666666667" />
         <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/chatting.xml" value="0.4884210526315789" />
         <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/chatting_room.xml" value="0.25" />
+        <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/fragment_chats.xml" value="0.15374873353596757" />
+        <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/fragment_friends.xml" value="0.15374873353596757" />
+        <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/fragment_setting.xml" value="0.15172239108409322" />
+        <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/layout/menu.xml" value="0.15172239108409322" />
+        <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/menu/btm_navi_menu.xml" value="0.21481481481481482" />
+        <entry key="..\:/Android/Sdk/WhaleChat/app/src/main/res/menu/menu.xml" value="0.33" />
       </map>
     </option>
   </component>

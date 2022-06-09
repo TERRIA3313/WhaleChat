@@ -1,7 +1,10 @@
 package com.example.whalechat;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,16 +18,23 @@ import java.util.Base64;
 import java.util.HashMap;
 import org.apache.commons.lang3.RandomStringUtils;
 
-public class CipherModule extends AppCompatActivity {
-    static final int KEY_SIZE = 2048;
-    static String alg = "AES/CBC/PKCS5Padding";
+public class CipherModule extends Activity {
+    public static final int KEY_SIZE = 2048;
+    public static String alg = "AES/CBC/PKCS5Padding";
+    private static final String TAG = "CipherModule";
+    Context context;
+
+    public CipherModule(Context context){
+        this.context = context;
+    }
 
     public void createPublicKey(){
         HashMap<String, String> rsaKeyPair = createKeypairAsString();
         String publicKey = rsaKeyPair.get("publicKey");
         String privateKey = rsaKeyPair.get("privateKey");
+        Log.d(TAG, "PubKey : " + publicKey + " PrivateKey : " + privateKey);
 
-        SharedPreferences preferences = getSharedPreferences("RSA", MODE_PRIVATE);
+        SharedPreferences preferences = context.getSharedPreferences("RSA", MODE_PRIVATE);
         @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = preferences.edit();
 
         editor.putString("publicKey", publicKey);
@@ -37,7 +47,21 @@ public class CipherModule extends AppCompatActivity {
         String key = RandomStringUtils.randomAlphanumeric(32);
         String iv = key.substring(0, 16);
 
-        SharedPreferences preferences = getSharedPreferences(roomName, MODE_PRIVATE);
+        SharedPreferences preferences =  context.getSharedPreferences(roomName, MODE_PRIVATE);
+        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = preferences.edit();
+
+        editor.putString("key", key);
+        editor.putString("iv", iv);
+
+        editor.apply();
+    }
+
+    public void debugSymmetricKey(){
+        String key = "01234567890123456789012345678901";
+        String iv = key.substring(0, 16);
+        String name = "-N423P8b-Jiy39H85BjQ";
+
+        SharedPreferences preferences =  context.getSharedPreferences(name, MODE_PRIVATE);
         @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = preferences.edit();
 
         editor.putString("key", key);
@@ -69,7 +93,7 @@ public class CipherModule extends AppCompatActivity {
         return stringKeypair;
     }
 
-    public static String encryptRSA(String plainData, String stringPublicKey) {
+    public String encryptRSA(String plainData, String stringPublicKey) {
         String encryptedData = null;
         try {
             //평문으로 전달받은 공개키를 공개키객체로 만드는 과정
@@ -91,7 +115,7 @@ public class CipherModule extends AppCompatActivity {
         return encryptedData;
     }
 
-    public static String decryptRSA(String encryptedData, String stringPrivateKey) {
+    public String decryptRSA(String encryptedData, String stringPrivateKey) {
         String decryptedData = null;
         try {
             //평문으로 전달받은 개인키를 개인키객체로 만드는 과정
@@ -115,21 +139,21 @@ public class CipherModule extends AppCompatActivity {
     }
 
     public String encryptAES(String text, String key, String iv) throws Exception {
+        Log.d(TAG, "Text : " + text + " Key : " + key + " iv : " + iv);
         Cipher cipher = Cipher.getInstance(alg);
         SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
         IvParameterSpec ivParamSpec = new IvParameterSpec(iv.getBytes());
         cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivParamSpec);
-
         byte[] encrypted = cipher.doFinal(text.getBytes("UTF-8"));
         return Base64.getEncoder().encodeToString(encrypted);
     }
 
     public String decryptAES(String cipherText, String key, String iv) throws Exception {
+        Log.d(TAG, "Text : " + cipherText + " Key : " + key + " iv : " + iv);
         Cipher cipher = Cipher.getInstance(alg);
         SecretKeySpec keySpec = new SecretKeySpec(key.getBytes(), "AES");
         IvParameterSpec ivParamSpec = new IvParameterSpec(iv.getBytes());
         cipher.init(Cipher.DECRYPT_MODE, keySpec, ivParamSpec);
-
         byte[] decodedBytes = Base64.getDecoder().decode(cipherText);
         byte[] decrypted = cipher.doFinal(decodedBytes);
         return new String(decrypted, "UTF-8");

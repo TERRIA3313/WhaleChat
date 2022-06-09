@@ -1,5 +1,8 @@
 package com.example.whalechat;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.net.Uri;
 import android.util.Log;
@@ -36,12 +39,13 @@ import java.util.TreeMap;
 
 public class ChattingListAdapter extends RecyclerView.Adapter<ChattingListAdapter.MyViewHolder> {
     private static final String TAG = "ChattingListAdapter";
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd hh:mm");
-
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss");
     private ArrayList<ChatModel> chatModels = new ArrayList<>();
     private ArrayList<String> chatKey = new ArrayList<>();
     private String uid;
     private String ownerUid;
+    private CipherModule module;
+    private Context context;
 
     public void addItem(ChatModel chatModel, String key){
         chatModels.add(chatModel);
@@ -55,6 +59,8 @@ public class ChattingListAdapter extends RecyclerView.Adapter<ChattingListAdapte
         //LayoutInflater inflater=LayoutInflater.from(parent.getContext());
         //View view=inflater.inflate(R.layout.chatting_room,parent,false);
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.chatting_room, parent, false);
+        context = parent.getContext().getApplicationContext();
+        module = new CipherModule(context);
         return new MyViewHolder(view);
     }
 
@@ -90,8 +96,15 @@ public class ChattingListAdapter extends RecyclerView.Adapter<ChattingListAdapte
         Map<String,ChatModel.Comment> commentMap = new TreeMap<>(Collections.reverseOrder());
         commentMap.putAll(chatModels.get(position).comments);
         String lastMessageKey = (String) commentMap.keySet().toArray()[0];
-        myViewHolder.Message.setText(chatModels.get(position).comments.get(lastMessageKey).message);
-
+        load(chatKey.get(position));
+        Log.d(TAG, "Key = " + chatKey.get(position));
+        String message = null;
+        try {
+            message = module.decryptAES(chatModels.get(position).comments.get(lastMessageKey).message, AESModel.key, AESModel.iv);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        myViewHolder.Message.setText(message);
 
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
         long unixTime = (long) chatModels.get(position).comments.get(lastMessageKey).timestamp;
@@ -156,5 +169,11 @@ public class ChattingListAdapter extends RecyclerView.Adapter<ChattingListAdapte
 
     public String getKey(int position){
         return chatKey.get(position);
+    }
+
+    void load(String Key){
+        SharedPreferences preferences = context.getSharedPreferences(Key, context.MODE_PRIVATE);
+        AESModel.key = preferences.getString("key", null);
+        AESModel.iv = preferences.getString("iv", null);
     }
 }

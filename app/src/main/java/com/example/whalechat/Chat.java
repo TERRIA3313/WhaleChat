@@ -7,8 +7,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -20,7 +24,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Chat extends AppCompatActivity {
     private static final String TAG = "Chat";
@@ -29,6 +35,9 @@ public class Chat extends AppCompatActivity {
     private RecyclerView.LayoutManager mLayoutManager;
     private FirebaseAuth firebaseAuth;
     private String Nickname;
+    private CipherModule module;
+    Button push_button;
+    EditText message;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,11 +47,17 @@ public class Chat extends AppCompatActivity {
         Intent intent = getIntent();
         String Key = intent.getStringExtra("key");
 
+        module = new CipherModule(getApplicationContext());
+        load(Key);
+
         //파이어베이스 초기화
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference myRef = database.getReference();
         firebaseAuth = FirebaseAuth.getInstance();
         FirebaseUser user = firebaseAuth.getCurrentUser();
+
+        push_button = findViewById(R.id.push_button);
+        message = findViewById(R.id.input_text);
 
         //리사이클러 뷰 등록
         mRecyclerView = findViewById(R.id.chat_recycler_view);
@@ -69,15 +84,26 @@ public class Chat extends AppCompatActivity {
         });
         mRecyclerView.setAdapter(mAdapter);
 
-        Log.d(TAG, "Key : " + Key);
         //채팅방을 열었을 때
-        myRef.child("Rooms").child(Key).child("comments").addValueEventListener(new ValueEventListener() {
+        myRef.child("Rooms").child(Key).child("comments").addChildEventListener(new ChildEventListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                for(DataSnapshot item :snapshot.getChildren()){
-                    Log.d(TAG, String.valueOf(item));
-                    mAdapter.addChat(item.getValue(ChatData.class));
-                }
+            public void onChildAdded(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+                mAdapter.addChat(snapshot.getValue(ChatData.class));
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
             }
 
             @Override
@@ -85,5 +111,43 @@ public class Chat extends AppCompatActivity {
 
             }
         });
+
+        push_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(message.getText().toString().length() > 0){
+                    ChatModel.Comment comment = new ChatModel.Comment();
+                    comment.nickname = Nickname;
+                    comment.timestamp = System.currentTimeMillis();
+                    comment.uid = user.getUid();
+                    try {
+                        comment.message = module.encryptAES(message.getText().toString(), AESModel.key, AESModel.iv);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    String messageKey = myRef.child("Rooms").child(Key).child("comments").push().getKey();
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("/Rooms/" + Key + "/comments/" + messageKey, comment);
+                    if(myRef.child("Rooms").child(Key).child("comments").child("welcome").getKey() != null){
+                        try{
+                            myRef.child("Rooms").child(Key).child("comments").child("welcome").setValue(null);
+                        }
+                        catch(Exception e) {
+                            Log.d(TAG, "ERROR : " + e);
+                        }
+                    }
+                    myRef.updateChildren(childUpdates);
+                    message.setText("");
+                    mRecyclerView.scrollToPosition(mAdapter.getItemCount());
+                }
+            }
+        });
+    }
+
+    void load(String Key){
+        SharedPreferences preferences = getSharedPreferences(Key, MODE_PRIVATE);
+        AESModel.key = preferences.getString("key", null);
+        AESModel.iv = preferences.getString("iv", null);
     }
 }

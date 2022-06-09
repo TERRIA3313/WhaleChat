@@ -28,20 +28,21 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> {
     private static final String TAG = "ChatAdapter";
     private List<ChatData> mDataset = new ArrayList<>();
     private String myNickName;
-    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd hh:mm");
+    private SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd HH:mm:ss", Locale.KOREA);
+    private CipherModule module;
 
     public static class MyViewHolder extends RecyclerView.ViewHolder{
         public TextView TextView_Nickname;
         public TextView TextView_Message;
         public TextView TextView_Timestamp;
         public ImageView ImageView_ProfileImage;
-        public String ProfileUri;
         public View rootView;
 
         public MyViewHolder(View v){
@@ -62,6 +63,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
         LinearLayout v = (LinearLayout) LayoutInflater.from(parent.getContext()).inflate(R.layout.chatting, parent, false);
 
         MyViewHolder vh = new MyViewHolder(v);
+        module = new CipherModule(parent.getContext().getApplicationContext());
         return vh;
     }
 
@@ -70,19 +72,23 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
         final MyViewHolder myViewHolder = (MyViewHolder) holder;
         ChatData chat = mDataset.get(position);
         holder.TextView_Nickname.setText(chat.getNickname());
-        holder.TextView_Message.setText(chat.getMessage());
+        String message = null;
+        try {
+            message = module.decryptAES(chat.getMessage(), AESModel.key, AESModel.iv);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        holder.TextView_Message.setText(message);
         simpleDateFormat.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
         long unixTime = (long) chat.getTimestamp();
         Date date = new Date(unixTime);
         holder.TextView_Timestamp.setText(simpleDateFormat.format(date));
-        Log.d(TAG, "My Nickname is " + this.myNickName);
         if(chat.getNickname().equals(this.myNickName)){
             holder.TextView_Message.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
             holder.TextView_Timestamp.setTextAlignment(View.TEXT_ALIGNMENT_TEXT_END);
             holder.TextView_Nickname.setVisibility(View.INVISIBLE);
         }
         else if(chat.getNickname().equals("server")){
-            holder.TextView_Message.setGravity(View.TEXT_ALIGNMENT_CENTER);
             holder.TextView_Message.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             holder.TextView_Timestamp.setVisibility(View.INVISIBLE);
             holder.TextView_Nickname.setVisibility(View.INVISIBLE);
@@ -124,7 +130,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.MyViewHolder> 
 
     public void addChat(ChatData chat){
         mDataset.add(chat);
-        notifyItemInserted(mDataset.size()-1);
+        notifyDataSetChanged();
     }
 
     public void setNickname(String Nickname){

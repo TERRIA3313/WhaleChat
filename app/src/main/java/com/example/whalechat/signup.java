@@ -45,6 +45,8 @@ public class signup extends AppCompatActivity {
     private ImageView profileImage;
     private Intent intent;
     private Uri file;
+    private boolean equalName;
+    private CipherModule module;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +62,8 @@ public class signup extends AppCompatActivity {
         mNickname = findViewById(R.id.user_nickname);
         profileImage = findViewById(R.id.profileImage);
         profileChange = false;
+        equalName = true;
+        module = new CipherModule(getApplicationContext());
 
         //사진 변경 클릭
         profileImage.setOnClickListener(new View.OnClickListener() {
@@ -108,6 +112,16 @@ public class signup extends AppCompatActivity {
                 if(password.equals(passwordcheck)){
                     Log.d(TAG, "등록 버튼 " + User_Id + " , " + password);
 
+                    SharedPreferences preferences = getSharedPreferences("RSA", MODE_PRIVATE);
+                    if(preferences.getAll().isEmpty()) {
+                        module.createPublicKey();
+                        SharedPreferences newPreferences = getSharedPreferences("RSA", MODE_PRIVATE);
+                        loadRSA(newPreferences);
+                    }
+                    else {
+                        loadRSA(preferences);
+                    }
+
                     // 파이어베이스에 유저 정보 등록
                     firebaseAuth.createUserWithEmailAndPassword(User_Id + "@gmail.com", password).addOnCompleteListener(signup.this, new OnCompleteListener<AuthResult>() {
                         @Override
@@ -123,6 +137,7 @@ public class signup extends AppCompatActivity {
                                 hashMap.put("uid", uid);
                                 hashMap.put("email", User_Id);
                                 hashMap.put("name",name);
+                                hashMap.put("pubKey", RSAModel.publicKey);
 
                                 if(profileChange)
                                 {
@@ -181,5 +196,10 @@ public class signup extends AppCompatActivity {
 
             }
         });
+    }
+
+    void loadRSA(SharedPreferences preferences){
+        RSAModel.publicKey = preferences.getString("publicKey", null);
+        RSAModel.privateKey = preferences.getString("privateKey", null);
     }
 }

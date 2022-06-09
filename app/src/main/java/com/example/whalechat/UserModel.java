@@ -4,5 +4,6 @@ public class UserModel {
     public String email;
     public String name;
     public String profileImage;
+    public String pubKey;
     public String uid;
 }
