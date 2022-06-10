@@ -17,12 +17,14 @@ public class popup_create_room extends Activity {
     EditText roomName;
     String uid;
     ChatModel chatModel;
+    CipherModule module;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_popup_create_room);
+        module = new CipherModule(getApplicationContext());
 
         roomName = findViewById(R.id.inputRoomName);
 
@@ -46,7 +48,7 @@ public class popup_create_room extends Activity {
         childUpdates.put("/Rooms/" + key, chatModel);
         FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
 
-        Toast.makeText(this, "키 : " + key, Toast.LENGTH_SHORT).show();
+        module.createSymmetricKey(key);
 
         Intent intent = new Intent();
         intent.putExtra("key", key);
