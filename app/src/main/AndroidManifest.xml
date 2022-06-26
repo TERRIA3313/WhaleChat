@@ -13,9 +13,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".HomeActivity"
+            android:name=".popup_invite_friends"
             android:exported="false"
-            android:label="@string/title_activity_home" />
+            android:theme="@android:style/Theme.Dialog"/>
+        <activity
+            android:name=".option"
+            android:exported="false" />
         <activity
             android:name=".popup_create_room"
             android:exported="false"

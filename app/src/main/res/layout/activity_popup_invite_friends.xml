@@ -15,7 +15,7 @@
             android:layout_height="53dp"
             android:background="#ff7a00"
             android:gravity="center"
-            android:text="Create Room"
+            android:text="Invite Friends"
             android:textColor="#1B5E20"
             android:textSize="20sp" />
     </LinearLayout>
@@ -33,7 +33,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="Input your Room Name"
+            android:hint="Input your Friends Name"
             android:inputType="textPersonName"
             android:minHeight="48dp" />
 

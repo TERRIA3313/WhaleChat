@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -37,6 +38,8 @@ public class Chat extends AppCompatActivity {
     private String Nickname;
     private CipherModule module;
     Button push_button;
+    Button add_button;
+    String Key;
     EditText message;
 
     @Override
@@ -45,7 +48,7 @@ public class Chat extends AppCompatActivity {
         setContentView(R.layout.activity_chat);
 
         Intent intent = getIntent();
-        String Key = intent.getStringExtra("key");
+        Key = intent.getStringExtra("key");
 
         module = new CipherModule(getApplicationContext());
         load(Key);
@@ -140,7 +143,19 @@ public class Chat extends AppCompatActivity {
                     myRef.updateChildren(childUpdates);
                     message.setText("");
                     mRecyclerView.scrollToPosition(mAdapter.getItemCount());
+
                 }
+            }
+        });
+
+        add_button = findViewById(R.id.add_friends);
+        add_button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(Chat.this, popup_invite_friends.class);
+                String key = Key;
+                intent.putExtra("key", key);
+                startActivity(intent);
             }
         });
     }
@@ -149,5 +164,15 @@ public class Chat extends AppCompatActivity {
         SharedPreferences preferences = getSharedPreferences(Key, MODE_PRIVATE);
         AESModel.key = preferences.getString("key", null);
         AESModel.iv = preferences.getString("iv", null);
+    }
+
+    public boolean onKeyDown(int keycode, KeyEvent event){
+        if(keycode == KeyEvent.KEYCODE_BACK){
+            Intent intent = new Intent(Chat.this, ChatList.class);
+            startActivity(intent);
+            finish();
+            return true;
+        }
+        return false;
     }
 }

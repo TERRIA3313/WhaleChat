@@ -56,20 +56,6 @@ public class CipherModule extends Activity {
         editor.apply();
     }
 
-    public void debugSymmetricKey(){
-        String key = "01234567890123456789012345678901";
-        String iv = key.substring(0, 16);
-        String name = "-N423P8b-Jiy39H85BjQ";
-
-        SharedPreferences preferences =  context.getSharedPreferences(name, MODE_PRIVATE);
-        @SuppressLint("CommitPrefEdits") SharedPreferences.Editor editor = preferences.edit();
-
-        editor.putString("key", key);
-        editor.putString("iv", iv);
-
-        editor.apply();
-    }
-
     public static HashMap<String, String> createKeypairAsString() {
         HashMap<String, String> stringKeypair = new HashMap<>();
         try {
@@ -145,6 +131,7 @@ public class CipherModule extends Activity {
         IvParameterSpec ivParamSpec = new IvParameterSpec(iv.getBytes());
         cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivParamSpec);
         byte[] encrypted = cipher.doFinal(text.getBytes("UTF-8"));
+        Log.d(TAG, "Encrypted Text : " + Base64.getEncoder().encodeToString(encrypted));
         return Base64.getEncoder().encodeToString(encrypted);
     }
 

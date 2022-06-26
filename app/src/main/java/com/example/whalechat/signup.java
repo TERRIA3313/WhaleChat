@@ -26,8 +26,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -107,6 +110,22 @@ public class signup extends AppCompatActivity {
                     Toast.makeText(signup.this, "비밀번호가 너무 짧습니다.(6자 이상)", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                FirebaseDatabase.getInstance().getReference().child("Users").orderByChild("name").equalTo(mNickname.getText().toString()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        if(snapshot.getValue() != null)
+                        {
+                            Toast.makeText(signup.this, "이미 사용중인 닉네임입니다.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+
+                    }
+                });
 
                 // 패스워드와 패스워드 재입력 부분이 일치할 경우
                 if(password.equals(passwordcheck)){
